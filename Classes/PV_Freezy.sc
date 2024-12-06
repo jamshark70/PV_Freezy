@@ -1,28 +1,7 @@
 PV_Freezish : PV_ChainUGen {
 	*new { |buffer, atkCoeff = 0, dcyCoeff = -1|
-		var rate = case
-		{ atkCoeff.rate == \audio } {
-			if(dcyCoeff.rate != \audio) { dcyCoeff = K2A.ar(dcyCoeff) };
-			\audio
-		}
-		{ dcyCoeff.rate == \audio } {
-			if(atkCoeff.rate != \audio) { atkCoeff = K2A.ar(atkCoeff) };
-			\audio
-		}
-		{ dcyCoeff.rate > \control } {
-			\scalar
-		}
-		{ atkCoeff.rate == \control } {
-			\control
-		}
-		{ \scalar };
-		if(rate == \scalar) {
+		if(dcyCoeff.rate > \control) {
 			if(dcyCoeff < 0.0) { dcyCoeff = atkCoeff };
-		} {
-			dcyCoeff = Select.perform(UGen.methodSelectorForRate(rate),
-				dcyCoeff < 0.0,
-				[dcyCoeff, atkCoeff]
-			)
 		};
 		^this.multiNew('control', buffer, atkCoeff, dcyCoeff)
 	}
@@ -40,7 +19,20 @@ PV_Freezish : PV_ChainUGen {
 		};
 		var factor = log(0.001) * hop * frames * sdur;
 		var coeff = { |time|
-			exp(factor / max(0.001, time))
+			var return;
+			if(time.rate > \control) {
+				if(time == 0) {
+					return = 0
+				}
+			} {
+				return = Select.perform(UGen.methodSelectorForRate(time.rate),
+					time <= 0, [
+						exp(factor / time),  // time > 0
+						if(time.rate == \control) { 0 } { DC.ar(0) }
+					]
+				)
+			};
+			return
 		};
 		^this.multiNew('control', buffer, coeff.(atkTime), coeff.(dcyTime))
 	}
