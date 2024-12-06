@@ -1,5 +1,7 @@
 /*
-    Copyright (c) 2023 Sam Pluta
+    Copyright (c) Joshua Parmenter and James Harkins
+    Repository structure by Sam Pluta
+
     Built upon the improved FFT and IFFT UGens for SuperCollider 3
     Copyright (c) 2007-2008 Dan Stowell, incorporating code from
     SuperCollider 3 Copyright (c) 2002 James McCartney.
