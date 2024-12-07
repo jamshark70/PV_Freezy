@@ -23,6 +23,8 @@ PV_Freezish : PV_ChainUGen {
 			if(time.rate > \control) {
 				if(time == 0) {
 					return = 0
+				} {
+					return = exp(factor / time)
 				}
 			} {
 				return = Select.perform(UGen.methodSelectorForRate(time.rate),
